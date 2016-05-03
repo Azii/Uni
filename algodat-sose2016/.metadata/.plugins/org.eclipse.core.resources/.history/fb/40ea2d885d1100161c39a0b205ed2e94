@@ -1,0 +1,13 @@
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+import ArrayCheck;
+
+public class FibonacciFunction {
+
+	@Test
+	public void test() {
+		assertEquals(3, ArrayCheck.nthFibonacci(3))
+	}
+
+}

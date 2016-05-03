@@ -1,0 +1,39 @@
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import org.junit.Before;
+import org.junit.Test;
+
+
+public class ArrayCheckTest {
+	// NOTTODO DIESE ZEILE BITTE NICHT VERAENDERN!!
+	// TODO Fuehrt eure Tests auf diesem ArrayCheck-Objekt aus!
+	// Ansonsten kann eure Abgabe moeglicherweise nicht
+	// gewertet werden.
+	public ArrayCheck ArrayCheck = new ArrayCheck();
+	public ArrayList<Integer> al = new ArrayList<Integer>();
+	
+
+	@Test(timeout = 1000)
+	public void testAllDivisibleBy() {
+		// TODO Schreibt verschiedene Testfaelle, die unterschiedliche Arrays
+		// anlegen und an testAllDivisibleBy uebergeben.
+		// Testet auch randfaelle wie z.B. leere arrays.
+	}
+
+	@Test(timeout = 1000)
+	public void testIsFibonacci() {
+		// TODO Schreibt verschiedene Testfaelle, fuer testIsFibonacci.
+		assertEquals(false, ArrayCheck.isFibonacci(al));
+		al.add(0);
+		assertEquals(false)
+		
+	}
+
+
+}
+
