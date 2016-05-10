@@ -1,0 +1,44 @@
+class Sphere {
+	
+	Point center;
+	double radius;
+	
+	Sphere(int x, int y, int z, double r){
+		// TODO
+	}
+	
+	Sphere(Point c, double r){
+		// TODO
+	}
+	
+	double getX(){
+		return -1; // TODO
+	}
+
+	double getY(){
+		return -1; // TODO
+	}
+
+	double getZ(){
+		return -1; // TODO
+	}
+
+
+	double getRadius(){
+		return -1; // TODO
+	}
+
+	double calculateDiameter(){
+		return -1; // TODO
+	}	
+	
+	double calculatePerimeter(){
+		return -1; // TODO
+	}
+	
+	double calculateVolume(){
+		return -1; // TODO
+	}
+
+}
+
