@@ -5,7 +5,7 @@
  * @author AlgoDat
  *
  */
-public class Cuboid extends Body {
+public class Cuboid extends Cube {
 
 	double height, length, width;
 	

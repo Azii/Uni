@@ -81,8 +81,8 @@ public class Picture {
      *
      */
     public void rot180Deg(){
-    	rot90DegRight();
-    	rot90DegRight();
+		//TODO
+
     }
     
     /**

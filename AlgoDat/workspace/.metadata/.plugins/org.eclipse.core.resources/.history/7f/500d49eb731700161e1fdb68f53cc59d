@@ -17,7 +17,7 @@ public class Cube extends Cuboid {
 	 * @param length the side length of the cube
 	 */
 	public Cube(double length) {
-		super(length, length, length);
+		this.length = length;
 	}
 
 	public double getLength(){

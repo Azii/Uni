@@ -63,17 +63,9 @@ public class Picture {
      *
      */
     public void rot90DegRight(){
-    	RGBColor[][] newMatrix = new RGBColor[height][width];
-    	
-    	for (int i = 0; i < height; i++)
-    	{
-    		for (int j = 0; j < width; j++)
-    		{
-    			newMatrix[i][j] = imageMatrix[j][i];
-    		}
-    	}
-    	
-    	imageMatrix = newMatrix;
+		//TODO
+
+        
     }
     
     /**
@@ -81,8 +73,8 @@ public class Picture {
      *
      */
     public void rot180Deg(){
-    	rot90DegRight();
-    	rot90DegRight();
+		//TODO
+
     }
     
     /**
