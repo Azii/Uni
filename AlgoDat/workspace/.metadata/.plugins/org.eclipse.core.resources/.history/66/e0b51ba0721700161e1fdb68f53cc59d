@@ -1,0 +1,37 @@
+/**
+ * Represents a Cube
+ * @author AlgoDat
+ */
+public class Cube extends Body {
+
+	double length;
+	/*
+	 * Constructor without parameter
+	 */
+	public Cube() {
+		this(0);
+	}
+	/*
+	 * Constructor with one parameter
+	 * 
+	 * @param length the side length of the cube
+	 */
+	public Cube(double length) {
+		this.length = length;
+	}
+
+	public double getLength(){
+		return this.length;
+	}
+	//TODO: ggf. weitere Methoden und member implementieren
+	@Override
+	double calculateVolume() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	@Override
+	double calculateSurface() {
+		return Math.pow(this.length, 3);
+	}
+}
+
