@@ -21,7 +21,9 @@ int right(int i)
 
 void swap(int i, int j)
 {
-	/* TODO */
+	node temp = Mem->heap[i];
+	Mem->heap[i] = Mem->heap[j];
+	Mem->heap[j] = temp;
 }
 
 /*
@@ -30,7 +32,9 @@ void swap(int i, int j)
  */
  int getGreatest(int i)
  {
-	/* TODO */
+	int left = left(i);
+	int right = right(i);
+	return max(i, left, right);
  }
 
 /*
@@ -71,12 +75,17 @@ void* _malloc(int len, int key)
 {
 	/* TODO */
 	/* Wie viele bloecke muessen reserviert werden? */
+	int num_blocks = ceil((float)len / BLOCK_SIZE);
 	/* Was muss in den Heap eingefuegt werden? */
+	node n = (node *) malloc(sizeof(node));
+	n->key = key;
+	n->blocks = num_blocks;
+	
 	/* Wo muss der Speicher reserviert werden? */
-
 	/* Initialisiere den Datentypen Inhalts des Speichers mit z.B. Integer.
 	 * Reine Willkuer.
 	 */
+	setType("%i", key);
 	 
 	/* Wohin sollte Mem->currMemPos jetzt zeigen? */
 	/* Was soll zurueckgegeben werden? */
@@ -86,9 +95,9 @@ int initMem()
 {
 	Mem = (heap *) malloc(sizeof(heap));
 	Mem->mem = (void *) malloc(MEMORY_SIZE);
-	
-	if (Mem == NULL)
-		printf("ERROR");
+	Mem->heapSize = 0;
+	Mem->currMemPos = Mem->mem;
+	return 1;
 }
 
 node getHighestPrio()
@@ -98,12 +107,19 @@ node getHighestPrio()
 
 node find(int key)
 {
-	/* TODO */
+	for (int i = 0; i < Mem->heapSize; i++)
+	{
+		if (heap[i].key == key)
+		{
+			return heap[i];
+		}
+	}
+	return NULL;
 }
 
 void freeMem()
 {
-	/* TODO */
+	free(Mem->mem);
 }
 
 /* VORGABE */

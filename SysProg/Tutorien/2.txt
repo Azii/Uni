@@ -1,0 +1,135 @@
+parbegin/parend:
+----------------------------
+p0;
+parbegin
+	begin
+	p2;
+	p5;
+	end
+	begin
+	p1;
+	parbegin
+		begin
+		p3;
+		end
+		begin
+		p4;
+		p6;
+		end
+	parend
+	end
+parend
+p7;
+
+fork/join:
+----------------------------
+begin
+p0;
+fork a
+p1;
+fork b
+p3;
+join b
+join a
+p7;
+end
+
+a:
+	begin
+	p2;
+	p5;
+	end
+	
+b:
+	begin
+	p4;
+	p6;
+	end
+	
+	
+2.4 b)
+
+fork/join:
+------------------------------
+void jobDH(){
+	jobD();
+	jobH();
+}
+
+jobA();
+pidB = fork(jobB());
+jobC();
+join(pidB);
+pidDH = fork(jobDH());
+jobE();
+jobF();
+join(pidDH);
+pidI = fork(jobI());
+jobG()
+join(pidI);
+jobK();
+
+parbegin/parend:
+-------------------------------
+
+jobA();
+parbegin
+	begin
+	jobB();
+	end
+	begin
+	jobC();
+	end
+parend
+
+parbegin
+	begin
+	jobE();
+	jobF();
+	end
+	begin
+	jobD();
+	jobH();
+	end
+parend
+
+parbegin
+	begin
+	jobI();
+	end
+	begin
+	jobG();
+	end
+parend
+
+jobK();
+
+
+2.5)
+
+Interrupthandler
+
+PCB (Process Control Block):
+ ID, Name, Process Counter, Register (Speicherzellen), Stack Pointer/Heap Pointer, Status
+
+1) Speichern des PCB des "alten" Prozesses
+2) Wähle den nächsten Prozess, der laufen soll
+3) Laden des PCB des "neuen" Prozesses
+4) return
+
+Wikipedia Artikel Multitasking
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
