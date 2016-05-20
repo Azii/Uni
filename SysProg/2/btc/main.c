@@ -25,6 +25,7 @@ int calculate_hash(Blockheader * blockheader, int offset, int num_hashes)
 	
 	unsigned long starting_nonce = n[0] << 24 | n[1] << 16 | n[2] << 8 | n[3];
 	starting_nonce += offset;
+	printf("%ld", starting_nonce);
 	unsigned long end_nonce = starting_nonce + num_hashes;
 	unsigned long nonce = starting_nonce;
 	
@@ -75,10 +76,13 @@ int bitcoin_loop(const unsigned int processcount) {
 	getWork(b_header);
 	// TODO: Split the calculation of the hashes into several segments based on the processcount
 	int segment_size = ceil(MAX_HASHES / processcount);
+	char * initial_nonce = malloc(sizeof(char) * 4);
+	memcpy(initial_nonce, &(b_header->nonce), sizeof(char) * 4);
 	
 	for (int i = 0; i < processcount; i++)
 	{
-		calculate_hash(b_header, i * segment_size, (i + 1) * segment_size); 
+		calculate_hash(b_header, i * segment_size, segment_size);
+		memcpy(&(b_header->nonce), initial_nonce, sizeof(char) * 4);
 	}
 	
 	// TODO: If a hash has the appropriate difficulty (hint: check_hash) print it on the console using print_hash
@@ -86,7 +90,7 @@ int bitcoin_loop(const unsigned int processcount) {
 	end = current_time_millis();
 	printf("Calculation finished after %.3fs\n", (double) (end - start) / 1000);
 	free(b_header);
-	return EXIT_FAILURE;
+	return EXIT_SUCCESS;
 }
 
 int bitcoin_parallel(const unsigned int processcount) {
@@ -105,7 +109,7 @@ int bitcoin_parallel(const unsigned int processcount) {
 	end = current_time_millis();
 	printf("Calculation finished after %.3fs\n", (double) (end - start) / 1000);
 
-	return EXIT_SUCCESS;
+	return EXIT_FAILURE;
 }
 
 
