@@ -14,6 +14,9 @@
 
 #define MAX_HASHES 10000
 
+unsigned long toulong(char *);
+char * to_reversed_char_arr(unsigned long);
+
 int calculate_hash(Blockheader * blockheader, int num_hashes)
 {
 	char * n = malloc(sizeof(char) * 4);
@@ -56,7 +59,14 @@ int calculate_hash(Blockheader * blockheader, int num_hashes)
 			print_hash(r2,size);
 		}
 		free(r2);
+		
 	}
+	printf("nonce end of calculate_hash function: %ld\n", nonce);
+	printf("blockheader nonce end of calc hash function: %ld\n", toulong(blockheader->nonce));
+	
+	char * end_nonce_char = to_reversed_char_arr(end_nonce);
+	memcpy(&(blockheader->nonce), end_nonce_char, sizeof(char) * 4);
+	
 	return EXIT_SUCCESS;
 }
 
@@ -71,16 +81,35 @@ int bitcoin_loop(const unsigned int processcount) {
 	getWork(blockheader);
 	// TODO: Split the calculation of the hashes into several segments based on the processcount
 	int segment_size = ceil((double)MAX_HASHES / processcount);
-	unsigned long nce;
+	
 	for (int i = 0; i < processcount; i++)
 	{
 		calculate_hash(blockheader, segment_size);
+		printf("nonce after run #%i: %ld\n", i, toulong(blockheader->nonce));
 	}
 
 	end = current_time_millis();
 	printf("Calculation finished after %.3fs\n", (double) (end - start) / 1000);
 	free(blockheader);
 	return EXIT_SUCCESS;
+}
+
+unsigned long toulong(char * n) {
+	char * asdf = malloc(sizeof(char) * 4);
+	memcpy(asdf, n, sizeof(char) * 4);
+	byte_reversal(asdf, sizeof(char) * 4);
+	
+	return asdf[0] << 24 | asdf[1] << 16 | asdf[2] << 8 | asdf[3];
+}
+
+char * to_reversed_char_arr(unsigned long u){
+	char * n = malloc(sizeof(char) * 4);
+	n[0] = u >> 24;
+	n[1] = u >> 16;
+	n[2] = u >> 8;
+	n[3] = u;
+	byte_reversal(n, sizeof(char) * 4);
+	return n;
 }
 
 int bitcoin_parallel(const unsigned int processcount) {
