@@ -19,8 +19,8 @@ char * to_reversed_char_arr(unsigned long);
 
 int calculate_hash(Blockheader * blockheader, int num_hashes)
 {
-	char * n = malloc(sizeof(char) * 4);
-	memcpy(n, &(blockheader->nonce), sizeof(char) * 4);
+	unsigned char * n = malloc(sizeof(char) * 4);
+	memcpy(n, blockheader->nonce, sizeof(char) * 4);
 	byte_reversal(n, sizeof(char) * 4);
 	
 	unsigned long starting_nonce = n[0] << 24 | n[1] << 16 | n[2] << 8 | n[3];
@@ -43,6 +43,7 @@ int calculate_hash(Blockheader * blockheader, int num_hashes)
 		blockheader->nonce[1] = n[1];
 		blockheader->nonce[2] = n[2];
 		blockheader->nonce[3] = n[3];
+		printf("blockheader->nonce val after assignment in for loop: %ld\n", toulong(blockheader->nonce));
 		// calculate the hash using the sha-256 hashing algorithm
 		char * hash;
 		size_t size = getData(blockheader,&hash);
@@ -61,13 +62,39 @@ int calculate_hash(Blockheader * blockheader, int num_hashes)
 		free(r2);
 		
 	}
-	printf("nonce end of calculate_hash function: %ld\n", nonce);
+	
+	printf("blockheader->nonce val after for loop: %ld", toulong(blockheader->nonce));
+	
+	unsigned char * end_nonce_char = to_reversed_char_arr(end_nonce - 1);
+	//memcpy(&(blockheader->nonce), end_nonce_char, sizeof(char) * 4);
+	blockheader->nonce[0] = end_nonce_char[0];
+	blockheader->nonce[1] = end_nonce_char[1];
+	blockheader->nonce[2] = end_nonce_char[2];
+	blockheader->nonce[3] = end_nonce_char[3];
+	
 	printf("blockheader nonce end of calc hash function: %ld\n", toulong(blockheader->nonce));
 	
-	char * end_nonce_char = to_reversed_char_arr(end_nonce);
-	memcpy(&(blockheader->nonce), end_nonce_char, sizeof(char) * 4);
+	free(n);
 	
 	return EXIT_SUCCESS;
+}
+
+unsigned long toulong(char * n) {
+	char * asdf = malloc(sizeof(char) * 4);
+	memcpy(asdf, n, sizeof(char) * 4);
+	byte_reversal(asdf, sizeof(char) * 4);
+	
+	return asdf[0] << 24 | asdf[1] << 16 | asdf[2] << 8 | asdf[3];
+}
+
+char * to_reversed_char_arr(unsigned long u){
+	char * n = malloc(sizeof(char) * 4);
+	n[0] = u >> 24;
+	n[1] = u >> 16;
+	n[2] = u >> 8;
+	n[3] = u;
+	byte_reversal(n, sizeof(char) * 4);
+	return n;
 }
 
 int bitcoin_loop(const unsigned int processcount) {
@@ -94,27 +121,9 @@ int bitcoin_loop(const unsigned int processcount) {
 	return EXIT_SUCCESS;
 }
 
-unsigned long toulong(char * n) {
-	char * asdf = malloc(sizeof(char) * 4);
-	memcpy(asdf, n, sizeof(char) * 4);
-	byte_reversal(asdf, sizeof(char) * 4);
-	
-	return asdf[0] << 24 | asdf[1] << 16 | asdf[2] << 8 | asdf[3];
-}
-
-char * to_reversed_char_arr(unsigned long u){
-	char * n = malloc(sizeof(char) * 4);
-	n[0] = u >> 24;
-	n[1] = u >> 16;
-	n[2] = u >> 8;
-	n[3] = u;
-	byte_reversal(n, sizeof(char) * 4);
-	return n;
-}
-
 int bitcoin_parallel(const unsigned int processcount) {
-	printf("\n\nStarting bitcoin_parallel\n");
-	/*// Start, end time
+	/*printf("\n\nStarting bitcoin_parallel\n");
+	// Start, end time
 	unsigned long start,end;
 	// Set start time
 	start = current_time_millis();
@@ -148,11 +157,11 @@ int bitcoin_parallel(const unsigned int processcount) {
 	blockheader->nonce[1] = nonce >> 16;
 	blockheader->nonce[2] = nonce >> 8;
 	blockheader->nonce[3] = nonce;
-	calculate_hash(blockheader, segment_size * pos, segment_size);
+	printf("pos: %i, blockheader->nonce: %ld", pos, toulong(blockheader->nonce));
+	calculate_hash(blockheader, segment_size);
 	
 	if (child_pid > 0)
 	{
-		wait(child_pid);
 		join(child_pid);
 	}
 	
@@ -160,8 +169,7 @@ int bitcoin_parallel(const unsigned int processcount) {
 	if (pos == 0)
 		printf("Calculation finished after %.3fs\n", (double) (end - start) / 1000);
 
-	return EXIT_SUCCESS;
-	*/
+	return EXIT_SUCCESS;*/
 	return EXIT_FAILURE;
 }
 
@@ -206,6 +214,7 @@ int bitcoin_simple() {
 		blockheader->nonce[1] = n[1];
 		blockheader->nonce[2] = n[2];
 		blockheader->nonce[3] = n[3];
+		printf("blockheader->nonce val after assignment in for loop: %ld\n", toulong(blockheader->nonce));
 		// calculate the hash using the sha-256 hashing algorithm
 		char * hash;
 		size_t size = getData(blockheader,&hash);
@@ -223,6 +232,7 @@ int bitcoin_simple() {
 		}
 		free(r2);
 	}
+	printf("blockheader->nonce after calculation in bitcoin simple: %ld", toulong(blockheader->nonce));
 	free(n);
 
 	end = current_time_millis();
