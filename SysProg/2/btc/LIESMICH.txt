@@ -1,0 +1,2 @@
+Anscheinend ist der Speedup aufgrund von Parralelisierungsoverhead nicht so groß bei kleinen MAX_HASHES werten. Versuch zum Vergleich mal, den Wert auf 10 oder 100 Mal so viel zu setzen, da ist bitcoin_parallel deutlich schneller,
+in der Größenordnung, die man erwarten würde.
