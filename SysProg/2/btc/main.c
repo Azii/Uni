@@ -16,6 +16,7 @@
 
 unsigned long toulong(char *);
 char * to_reversed_char_arr(unsigned long);
+void print_int_arr(int * i, int length);
 
 int calculate_hash(Blockheader * blockheader, int num_hashes)
 {
@@ -130,23 +131,35 @@ int bitcoin_parallel(const unsigned int processcount) {
 
 	// TODO: Create a Blockheader object and fill it with the initial data using the getWork Method
 	Blockheader * blockheader = malloc(sizeof(Blockheader));
+	getWork(blockheader);
 	// TODO: Split the calculation of the hashes into several segments based on the processcount
 	int segment_size = ceil((double) MAX_HASHES / processcount);
-	unsigned long starting_nonce = toulong(&(blockheader->nonce));
+	unsigned long starting_nonce = toulong(blockheader->nonce);
+	//printf("starting_nonce am anfang: %ld\n", starting_nonce);
+	
 	// TODO: Spawn a process for each segment
 	int pos = 0;
 	int * child_pids = malloc(sizeof(int) * processcount);
+	for (int i = 0; i < processcount; i++)
+	{
+		child_pids[i] = 0;
+	}
 	
 	for (; pos < processcount; pos++)
 	{
 		child_pids[pos] = fork();
 		if (child_pids[pos] < 0)
+		{
+			printf("failed forking");
 			return EXIT_FAILURE;
+		}
 		if (child_pids[pos] == 0)
+		{
 			break;
+		}
 	}
 	
-	if (child_pids[pos] == 0)
+	if (pos < processcount)
 	{
 		starting_nonce += pos * segment_size;
 		char * n = to_reversed_char_arr(starting_nonce);
@@ -165,6 +178,14 @@ int bitcoin_parallel(const unsigned int processcount) {
 	printf("Calculation finished after %.3fs\n", (double) (end - start) / 1000);
 
 	return EXIT_SUCCESS;
+}
+
+void print_int_arr(int * i, int length)
+{
+	for (int j = 0; j < length; j++)
+	{
+		printf(" %i: %i", j, i[j]);
+	}
 }
 
 
@@ -226,7 +247,7 @@ int bitcoin_simple() {
 		}
 		free(r2);
 	}
-	printf("blockheader->nonce after calculation in bitcoin simple: %ld", toulong(blockheader->nonce));
+	//printf("blockheader->nonce after calculation in bitcoin simple: %ld", toulong(blockheader->nonce));
 	free(n);
 
 	end = current_time_millis();
