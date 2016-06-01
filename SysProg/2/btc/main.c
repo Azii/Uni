@@ -16,6 +16,7 @@
 
 unsigned long toulong(char *);
 char * to_reversed_char_arr(unsigned long);
+void print_int_arr(int * i, int length);
 
 int calculate_hash(Blockheader * blockheader, int num_hashes)
 {
@@ -26,7 +27,7 @@ int calculate_hash(Blockheader * blockheader, int num_hashes)
 	unsigned long starting_nonce = n[0] << 24 | n[1] << 16 | n[2] << 8 | n[3];
 	unsigned long end_nonce = starting_nonce + num_hashes;
 	unsigned long nonce = starting_nonce;
-	printf("starting_nonce: %ld\n", starting_nonce);
+	//printf("starting_nonce: %ld\n", starting_nonce);
 	
 	// copy paste
 	for( ; nonce <= end_nonce; nonce++) {
@@ -43,7 +44,7 @@ int calculate_hash(Blockheader * blockheader, int num_hashes)
 		blockheader->nonce[1] = n[1];
 		blockheader->nonce[2] = n[2];
 		blockheader->nonce[3] = n[3];
-		printf("blockheader->nonce val after assignment in for loop: %ld\n", toulong(blockheader->nonce));
+		//printf("blockheader->nonce val after assignment in for loop: %ld\n", toulong(blockheader->nonce));
 		// calculate the hash using the sha-256 hashing algorithm
 		char * hash;
 		size_t size = getData(blockheader,&hash);
@@ -63,7 +64,7 @@ int calculate_hash(Blockheader * blockheader, int num_hashes)
 		
 	}
 	
-	printf("blockheader->nonce val after for loop: %ld", toulong(blockheader->nonce));
+	//printf("blockheader->nonce val after for loop: %ld", toulong(blockheader->nonce));
 	
 	unsigned char * end_nonce_char = to_reversed_char_arr(end_nonce - 1);
 	//memcpy(&(blockheader->nonce), end_nonce_char, sizeof(char) * 4);
@@ -72,7 +73,7 @@ int calculate_hash(Blockheader * blockheader, int num_hashes)
 	blockheader->nonce[2] = end_nonce_char[2];
 	blockheader->nonce[3] = end_nonce_char[3];
 	
-	printf("blockheader nonce end of calc hash function: %ld\n", toulong(blockheader->nonce));
+	//printf("blockheader nonce end of calc hash function: %ld\n", toulong(blockheader->nonce));
 	
 	free(n);
 	
@@ -112,7 +113,7 @@ int bitcoin_loop(const unsigned int processcount) {
 	for (int i = 0; i < processcount; i++)
 	{
 		calculate_hash(blockheader, segment_size);
-		printf("nonce after run #%i: %ld\n", i, toulong(blockheader->nonce));
+		//printf("nonce after run #%i: %ld\n", i, toulong(blockheader->nonce));
 	}
 
 	end = current_time_millis();
@@ -122,7 +123,7 @@ int bitcoin_loop(const unsigned int processcount) {
 }
 
 int bitcoin_parallel(const unsigned int processcount) {
-	/*printf("\n\nStarting bitcoin_parallel\n");
+	printf("\n\nStarting bitcoin_parallel\n");
 	// Start, end time
 	unsigned long start,end;
 	// Set start time
@@ -130,47 +131,61 @@ int bitcoin_parallel(const unsigned int processcount) {
 
 	// TODO: Create a Blockheader object and fill it with the initial data using the getWork Method
 	Blockheader * blockheader = malloc(sizeof(Blockheader));
+	getWork(blockheader);
 	// TODO: Split the calculation of the hashes into several segments based on the processcount
-	int segment_size = ceil(MAX_HASHES / processcount);
+	int segment_size = ceil((double) MAX_HASHES / processcount);
+	unsigned long starting_nonce = toulong(blockheader->nonce);
+	//printf("starting_nonce am anfang: %ld\n", starting_nonce);
+	
 	// TODO: Spawn a process for each segment
 	int pos = 0;
-	int child_pid = 0;
+	int * child_pids = malloc(sizeof(int) * processcount);
+	for (int i = 0; i < processcount; i++)
+	{
+		child_pids[i] = 0;
+	}
+	
 	for (; pos < processcount; pos++)
 	{
-		if ((child_pid = fork()) < 0)
+		child_pids[pos] = fork();
+		if (child_pids[pos] < 0)
 		{
+			printf("failed forking");
 			return EXIT_FAILURE;
 		}
-		else if (child_pid > 0)
+		if (child_pids[pos] == 0)
 		{
 			break;
 		}
 	}
-	char * n = malloc(sizeof(char) * 4);
-	memcpy(n, &(blockheader->nonce), sizeof(char) * 4);
-	byte_reversal(n, sizeof(char));
 	
-	unsigned long nonce = n[0] << 24 | n[1] << 16 | n[2] << 8 | n[3];
-	nonce += pos * segment_size;
-	
-	blockheader->nonce[0] = nonce >> 24;
-	blockheader->nonce[1] = nonce >> 16;
-	blockheader->nonce[2] = nonce >> 8;
-	blockheader->nonce[3] = nonce;
-	printf("pos: %i, blockheader->nonce: %ld", pos, toulong(blockheader->nonce));
-	calculate_hash(blockheader, segment_size);
-	
-	if (child_pid > 0)
+	if (pos < processcount)
 	{
-		join(child_pid);
+		starting_nonce += pos * segment_size;
+		char * n = to_reversed_char_arr(starting_nonce);
+		memcpy(&(blockheader->nonce), n, sizeof(char) * 4);
+		calculate_hash(blockheader, segment_size);
+		return EXIT_SUCCESS;
+	}
+	
+	int status;
+	for (int i = 0; i < processcount; i++)
+	{
+		wait(&status);
 	}
 	
 	end = current_time_millis();
-	if (pos == 0)
-		printf("Calculation finished after %.3fs\n", (double) (end - start) / 1000);
+	printf("Calculation finished after %.3fs\n", (double) (end - start) / 1000);
 
-	return EXIT_SUCCESS;*/
-	return EXIT_FAILURE;
+	return EXIT_SUCCESS;
+}
+
+void print_int_arr(int * i, int length)
+{
+	for (int j = 0; j < length; j++)
+	{
+		printf(" %i: %i", j, i[j]);
+	}
 }
 
 
@@ -214,7 +229,7 @@ int bitcoin_simple() {
 		blockheader->nonce[1] = n[1];
 		blockheader->nonce[2] = n[2];
 		blockheader->nonce[3] = n[3];
-		printf("blockheader->nonce val after assignment in for loop: %ld\n", toulong(blockheader->nonce));
+		//printf("blockheader->nonce val after assignment in for loop: %ld\n", toulong(blockheader->nonce));
 		// calculate the hash using the sha-256 hashing algorithm
 		char * hash;
 		size_t size = getData(blockheader,&hash);
@@ -232,7 +247,7 @@ int bitcoin_simple() {
 		}
 		free(r2);
 	}
-	printf("blockheader->nonce after calculation in bitcoin simple: %ld", toulong(blockheader->nonce));
+	//printf("blockheader->nonce after calculation in bitcoin simple: %ld", toulong(blockheader->nonce));
 	free(n);
 
 	end = current_time_millis();
