@@ -84,8 +84,8 @@ unsigned long toulong(char * n) {
 	char * asdf = malloc(sizeof(char) * 4);
 	memcpy(asdf, n, sizeof(char) * 4);
 	byte_reversal(asdf, sizeof(char) * 4);
-	
-	return asdf[0] << 24 | asdf[1] << 16 | asdf[2] << 8 | asdf[3];
+	unsigned long ret = asdf[0] << 24 | asdf[1] << 16 | asdf[2] << 8 | asdf[3];
+	return ret;
 }
 
 char * to_reversed_char_arr(unsigned long u){

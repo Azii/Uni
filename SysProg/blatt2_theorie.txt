@@ -1,0 +1,75 @@
+2.1
+
+Quelle(n): Vorlesungsfolien
+
+a) Arten der Prozessumschaltung:
+Präemptiv: Ein Prozess wird, bevor er fertig ist, unterbrochen.
+Kooperativ: Ein Prozess hört erst auf zu rechnen, wenn er fertig ist.
+
+b) Zustände:
+Bereit, Laufend, Blockiert, Beendet
+
+Bereit -> Laufend (Assign)
+Laufend -> Bereit (Resign)
+Laufend -> Blockiert (Block)
+Blockiert -> Bereit (Ready)
+Laufend -> Beendet (Retire)
+
+c)
+KL-Threads:
+- Umschaltung erfordert Umschaltung der Kontroller an das Betriebssystem
+- Umschaltung erfordert meist Wechsel des Adressraums
+Durch Wechsel des Adressraums, Umschaltung durch Unterbrechung und Aktivierung der Verwaltungsfunktionen
+entsteht ein nicht uneherheblicher Mehraufwand beim Umschalten. Daher sind KL-Threads recht "schwergewichtig".
+
+UL-Threads:
+- Realisiert im Adressraum der Anwendung
+- Der Prozessorverwaltung und dem Betriebssystem unbekannt
+- Umschaltung zwischen UL-Threads erfordert keinen Adressraumwechsel, daher vergleichsweise schnell
+- Laufzeitumgebung erforderlich zur Verwaltung und Umschaltung von Threads (ähnlich der im Betriebssystem
+  verwalteten Daten)
+
+d) Prozesse werden vom Betriebssystem verwaltet, Threads von Prozessen. Threads sind, in einem gewissen Sinn,
+zu einem Prozess, wie ein Prozess zu einem Betriebssystem.
+
+2.2
+parbegin/parend:
+
+parbegin
+	begin
+	p3;
+	p7;
+	end
+	begin
+	p2;
+	parbegin
+		p5;
+		p6;
+	parend
+	parbegin
+		p4;
+		p8;
+	parend
+	p9;
+parend
+p10;
+
+fork/join:
+
+void p3p7()
+{
+	p3;
+	p7;
+}
+
+p1;
+pidp3p7 = fork(pep7());
+p2;
+pidp6 = fork(p6);
+p5;
+join(pidp6);
+p4;
+p8;
+p9;
+join(pidp3p7);
+p10;
