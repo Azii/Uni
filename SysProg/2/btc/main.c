@@ -12,7 +12,7 @@
 #include "util.h"
 #include "blockheader.h"
 
-#define MAX_HASHES 10000
+#define MAX_HASHES 10000000
 
 unsigned long toulong(char *);
 char * to_reversed_char_arr(unsigned long);
