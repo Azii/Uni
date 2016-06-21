@@ -17,34 +17,47 @@ game_field* make_game_field(int width, int height, int num_threads) {
 	// weitere Struct-Komponenten (TIPP: Da set_glider/set_glider_gun so tun,
 	// als ob die Threads das Spielfeld gefüllt hätten, intialisieren Sie hier
 	// field_filled mit der Anzahl der verwendeten Gamer-Threads)
-	game_field * game_field = (game_field*)(malloc(sizeof(game_field)));
+	game_field * game_field = (malloc(sizeof(game_field)));
 	game_field->field = (int**)(malloc(sizeof(int)*width));
 	for (int i = 0; i < width; i++)
 	{
 		game_field->field[i] = (int*)(malloc(sizeof(int)*height));
 	}
-	game_field->threads = num_threads;
+	set_glider_gun(width, height, game_field->field);
+	game_field->num_threads = num_threads;
 	game_field->width = width;
 	game_field->height = height;
-	game_field->has_read = (int*)malloc(sizeof(pthread_mutex_t)*num_threads);
+	game_field->field_filled = num_threads;
+	game_field->field_read = 0;
+	pthread_mutex_init(game_field->finished_reading, NULL);
+	pthread_mutex_init(game_field->finished_writing, NULL);
+	pthread_mutex_init(game_field->finished_printing, NULL);
+	pthread_cond_init(game_field->read_lines, NULL);
+	pthread_cond_init(game_field->write_cond, NULL);
+	pthread_cond_init(game_field->print_cond, NULL);
+	//game_field->has_read = (int*)malloc(sizeof(pthread_mutex_t)*num_threads);
 	return game_field;
 }
 
 int write_to_field(game_field *field, int row_start, int num_rows, int **src_mat) {
 	pthread_mutex_lock(field->finished_reading);
 	while(!(field->num_finished_reading == field->num_threads))
-		pthread_cond_wait(&(field->read_lines), field->finished_reading);
+			pthread_cond_wait(&(field->read_lines), field->finished_reading);
 	pthread_mutex_unlock(field->finished_reading);
     // TODO: Stellen Sie sicher, dass jeder Gamer-Thread an dieser Stelle darauf
 	// wartet, bis alle anderen Gamer-Threads ihre Ränder ausgelesen haben
 
     // TODO: Stellen Sie danach sicher, dass jeder Gamer-Thread an dieser Stelle 
 	// solange wartet, bis die Ausgabe des Printer-Threads erfolgt
-	pthread_cond_wait(field->finished_printing, field->printer);
+	pthread_cond_wait(field->finished_printing, field->print_cond);
 
         for (int i = 0; i < num_rows; i++) {
             memcpy(field->field[row_start+i], src_mat[i], field->width*sizeof(int)); 
         }
+		
+	field->printed = false;
+	
+	print_game_field(0, NULL, field, NULL);
 
         // TODO: Zurücksetzen der Print-Bedingungen
         // TODO: Warten Sie darauf, dass alle Gamer-Threads in das Spielfeld 
@@ -60,8 +73,11 @@ void print_game_field(int GUI, SDL_Surface* screen, game_field *field, int** las
 	pthread_mutex_lock(field->finished_writing);
 	while(!(field->num_finished_writing == field->num_threads))
 		pthread_cond_wait(&(field->read_lines), field->finished_reading);
+	pthread_mutex_lock(field->finished_printing);
 	pthread_mutex_unlock(field->finished_reading);
 	
+	field->num_finished_reading = 0;
+	field->num_finished_writing = 0;
 	
     if (GUI == 1) {
         update_matrix(screen, field, last_field);
@@ -82,7 +98,11 @@ void print_game_field(int GUI, SDL_Surface* screen, game_field *field, int** las
     }
 	
     // TODO: Signalisieren Sie den anderen Threads, dass das Spielfeld ausgegeben wurde
-	pthread_cond_broadcast(field->finished_printing);
+	pthread_mutex_lock(field->finished_printing);
+	field->printed = 1;
+	pthread_cond_broadcast(field->print_cond);
+	pthread_mutex_unlock(field->finished_printing);
+	
 }
 
 

@@ -1,7 +1,7 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "SDL.h"
+#include "./libsdl_32/include/SDL/SDL.h"
 
 #include "utils.h"
 #include "game_field.h"
