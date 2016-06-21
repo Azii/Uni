@@ -1,6 +1,8 @@
 #include <stdbool.h>
 #include <unistd.h>
-#include "./libsdl_32/include/SDL/SDL.h"
+//#include "./libsdl_64/include/SDL/SDL.h"
+//#include <SDL.h>
+#include "SDL.h"
 #include "printer_thread.h"
 #include "utils.h"
 #include <sys/time.h>

@@ -3,7 +3,9 @@
 
 #include <pthread.h>
 #include <stdbool.h>
-#include "./libsdl_32/include/SDL/SDL.h"
+//#include "./libsdl_64/include/SDL/SDL.h"
+//#include <SDL.h>
+#include "SDL.h"
 
 
 /**
@@ -26,15 +28,12 @@ typedef struct {
     int num_threads;
     int height;
     int width;
-	int num_finished_reading;
-	int num_finished_writing;
-	pthread_mutex_t * finished_reading;
-	pthread_mutex_t * finished_writing;
-	pthread_mutex_t * finished_printing;
-	pthread_cond_t * read_lines;
+	pthread_mutex_t * read_mutex;
+	pthread_mutex_t * write_mutex;
+	pthread_mutex_t * print_mutex;
+	pthread_cond_t * read_cond;
 	pthread_cond_t * write_cond;
-	pthread_cond_t * print_cond; 	// broadcast to all threads with 
-										// pthread_cond_broadcast(finished_printing);
+	pthread_cond_t * print_cond;
 } game_field;
 
 
